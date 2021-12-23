@@ -174,7 +174,7 @@ ipcMain.on('url:open', (e,o) => {
     if(displayList.length > 1){
         retMessage = "Multiple monitors detected. You can only have 1 monitor connected in order to start the exam."
         mainWindow.webContents.send('user:valid', retMessage)
-       // return
+        return
     }
 
     let urlToOpen = o.url.toString();
