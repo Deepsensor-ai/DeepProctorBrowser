@@ -90,22 +90,9 @@ function httpGet(theUrl, o) {
                         console.log(`$ The message is :${retMessage}, the url is ${o.url}`);
                         mainWindow.loadURL(o.url)
                         mainWindow.kiosk = true
-                        mainWindow.modal = true
-                        mainWindow.minimizable= false,
-                        mainWindow.maximizable= false,
-                        mainWindow.alwaysOnTop= true,
-                        mainWindow.frame= false,
-                        mainWindow.movable= false,
-                        mainWindow.skipTaskbar= true,
-                        mainWindow.autoHideMenuBar= true,
                         mainWindow.on('blur', () => {
                             // Do your required stuff, when the window loose the focus
                             showQuitMessage()
-                            // console.log('lost focus');
-                            // mainWindow.restore();
-                            // mainWindow.focus();
-                            // mainWindow.setKiosk(true);
-                            //app.quit()
                         });
                 
                     }else {
@@ -187,7 +174,7 @@ ipcMain.on('url:open', (e,o) => {
     if(displayList.length > 1){
         retMessage = "Multiple monitors detected. You can only have 1 monitor connected in order to start the exam."
         mainWindow.webContents.send('user:valid', retMessage)
-        return
+       // return
     }
 
     let urlToOpen = o.url.toString();
