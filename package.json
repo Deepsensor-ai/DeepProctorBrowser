@@ -1,0 +1,30 @@
+{
+  "name": "deepproctorbrowser",
+  "version": "1.0.0",
+  "description": "DeepProctor Exam Browser",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon --exec electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=false --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"ImageShrink\"",
+    "package-linux": "electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=false --out=release-builds",
+    "create-installer-win": "node installer/win.js"
+  },
+  "author": "DeepProctor.AI",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^16.0.2",
+    "electron-winstaller": "^5.0.0",
+    "nodemon": "^2.0.15"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/Deepsensor-ai/DeepProctorBrowser.git"
+  },
+  "dependencies": {
+    "electron-packager": "^15.4.0",
+    "encodeurl": "^1.0.2",
+    "validator": "^13.7.0"
+  }
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../js/jquery-3.6.0.slim.min.js"></script>
+<link href="../cs/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            background-color: cadetblue;
+            /* adicionei um cor de fundo 'cool'*/
+            font: normal 15pt 'Inter',Arial;
+            /* mudei a fonte aumentando o tamanho*/
+        }
+        
+        button {
+            font-size: 200%;
+            width: 80px;
+            /* uns botoes mais largos*/
+            height: 80px;
+            /* mais altura */
+            font: normal 40pt Tahoma;
+            /* um fonte mais fixe*/
+            border-radius: 5pt;
+            /* um pouquinho de borda arrendondada */
+            background-color: #fafafa;
+        }
+        
+        input {
+            font-size: 40px;
+            /* tamanho da fonte maior*/
+            width: 330px;
+            height: 80px;
+            /* um input com mais altura*/
+            text-align: right;
+            border-radius: 5pt;
+            color: black;
+        }
+        
+        table {
+            margin: auto;
+            /* para centralizar a table no centro horizontalmente*/
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20pt;
+            color: white;
+            opacity: 25%;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            margin-top: 150px;
+        }
+        
+    </style>
+    <title>Calculator</title>
+</head>
+
+<body>
+
+    <table>
+        <tr>
+            <td colspan="4"><input id="display" name="display" disabled></input>
+            </td>
+        </tr>
+
+        <tr>
+            <td><button id="button1" value="1">1</button></td>
+            <td><button id="button2" value="2">2</button></td>
+            <td><button id="button3" value="3">3</button></td>
+            <td><button id="addButton">+</button></td>
+        </tr>
+        <tr>
+            <td><button id="button4" value="4">4</button></td>
+            <td><button id="button5" value="5">5</button></td>
+            <td><button id="button6" value="6">6</button></td>
+            <td><button id="subtractButton">-</button></td>
+        </tr>
+        <tr>
+            <td><button id="button7" value="7">7</button></td>
+            <td><button id="button8" value="8">8</button></td>
+            <td><button id="button9" value="9">9</button></td>
+            <td><button id="multiplyButton">*</button></td>
+        </tr>
+        <tr>
+            <td><button id="clearButton">C</button></td>
+            <td><button id="button0" value="0">0</button></td>
+            <td><button id="equalsButton">=</button></td>
+            <td><button id="divideButton">&#247;</button></td>
+        </tr>
+
+
+
+    </table>
+
+    <span id='output'>
+    <!-- Use this span for writing debug messages or anything else you think will help! --></span>
+
+
+    <script src="../js/calc.js"></script>
+
+
+</body>
+
+
+
+</html>

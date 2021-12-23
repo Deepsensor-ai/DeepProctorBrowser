@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+        http-equiv="Content-Security-Policy"
+        content="script-src 'self' 'unsafe-inline'"
+        />
+		<link rel="stylesheet" href="../css/all.min.css" />
+		<link rel="stylesheet" href="../css/materialize.min.css" />
+		<link rel="stylesheet" href="../css/style.css" />
+		<title> DeepProctor Exam Browser</title>
+	</head>
+	<body>
+		<div class="container center-align">
+			<h5><i class="fas fa-images"></i> DeepProctor Exam Browser</h5>
+        
+            <!-- <div class="card output">
+				<div class="card-content">
+					
+                    <p>
+                        <h7></i> DeepProctor Exam Browser</h7>
+                    </p>
+				</div>
+			</div> -->
+                <form id="image-form">	
+                    <input type="text" id="txtExamUrl" placeholder="Enter Exam Url" />
+                    <input type="submit" id="btnExam" class="black btn" value="Start Exam"  disabled/>
+                    <span id="returnMessage"></span>
+                </form>
+
+        
+		</div>
+
+		<script src="../js/materialize.min.js"></script>
+        <script>
+
+            let bridgeConnected = true;
+    
+            try{
+                const path = require('path')
+                const os = require('os')
+                const {ipcRenderer} = require('electron')
+                const {screen} = require('electron')
+                var validator = require('validator');
+
+                const form = document.getElementById("image-form")
+                const txtExamUrl = document.getElementById("txtExamUrl")
+                const btnExam = document.getElementById("btnExam")
+
+                if(bridgeConnected){
+                    ipcRenderer.on('user:valid', (e,d) => {
+                        console.log(`User validated..${d}`);
+                        document.getElementById("returnMessage").innerText = d
+
+                        M.toast({
+                                html: d,
+                            })
+                    })
+                }
+            
+
+                txtExamUrl.addEventListener('input', e => {
+                    console.log(`changing ${txtExamUrl.value}`)
+                    console.log(isValidHttpUrl(txtExamUrl.value));
+                    btnExam.disabled = !isValidHttpUrl(txtExamUrl.value)
+                })
+
+            
+                form.addEventListener('submit', e => {
+                    e.preventDefault()
+                    var url = txtExamUrl.value
+                    console.log(`Form was submitted`)
+                    document.getElementById("returnMessage").innerText = ""
+
+                    if(bridgeConnected){
+                        ipcRenderer.send('url:open', {
+                        url
+                        }
+                    )
+                    }
+                
+                })
+            }catch(e){
+                bridgeConnected = false;
+                console.log(`Failed to connect to bridge`);
+            }
+        
+            function isValidHttpUrl(_string) {
+                const matchpattern = /^https:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/gm;
+                    return matchpattern.test(_string);
+            }
+
+        </script>
+	</body>
+</html>
