@@ -166,12 +166,12 @@ function httpGet(theUrl, o) {
                         console.log(`$ The message is :${retMessage}, the url is ${o.url}`);
                         mainWindow.loadURL(o.url)
                         mainWindow.frame = false
-                        mainWindow.maximize()
-                        mainWindow.kiosk = false
+                        //mainWindow.maximize()
+                        mainWindow.kiosk = true
 
                         mainWindow.on('blur', () => {
                             // Do your required stuff, when the window loose the focus
-                            // showQuitMessage()
+                             showQuitMessage()
                         });                   
                         const timer = setInterval(function A() {
                             // dialog.showMessageBox(mainWindow, {message:"Test"}).then(() => app.quit())
