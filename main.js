@@ -1,5 +1,9 @@
 const { app, BrowserWindow, globalShortcut, Menu, ipcMain,screen, shell, dialog, net } = require('electron')
 const Main = require('electron/main');
+
+var _ = require('lodash');
+var ps = require('current-processes');
+
 var encodeUrl = require('encodeurl')
 
  //handle setupevents as quickly as possible
@@ -23,10 +27,10 @@ let mainWindow
 let examWindow
 let displayList
 let violationCount = 0
+let isCalcInFocus = false
+let appsFound = []
 
-
-function createMainWindow() {
-
+function getMonitorCount(){
     displayList = screen.getAllDisplays();
 
     console.log(`${displayList.length}`)
@@ -34,18 +38,73 @@ function createMainWindow() {
     displayList.forEach(element => {
         console.log(`Width - ${element.workArea.width} - Heiight - ${element.workArea.height}`)
     });
-    
+
+    return displayList;
+}
+
+function getProcessList(){
+    console.log("Printing process list..")
+
+    appsFound = []
+
+    ps.get(function(err, processes) {
+        
+        var illegalAppMap = new Map()
+            illegalAppMap.set('outlook', ' MS Outlook')
+            illegalAppMap.set('winword',' MS Word')
+            illegalAppMap.set('msteams',' Teams')
+            illegalAppMap.set('msedge',' MS Edge Browser')
+            illegalAppMap.set('zoom',' Zoom')
+            illegalAppMap.set('mstsc',' MS Teams Chat')
+            illegalAppMap.set('powerpnt',' MS Power Point')
+            illegalAppMap.set('excel',' MS Excel')
+            illegalAppMap.set('snagit32',' SnagIT - TechSmith')
+            illegalAppMap.set('screensketch',' Screen Capture')
+            illegalAppMap.set('notepad',' NotePad')
+            illegalAppMap.set('chrome',' Chrome Browser')
+            illegalAppMap.set('slack',' Slack')
+            illegalAppMap.set('facebook',' Facebook')
+            illegalAppMap.set('skype',' Skype')
+            illegalAppMap.set('firefox',' FireFox')
+            illegalAppMap.set('iexplore',' Internet Explorer')
+
+        processes.forEach( o => {
+            let found = illegalAppMap.get(o.name.toLowerCase())
+            if(found != undefined){
+                if(! appsFound.includes(found)){
+                    appsFound.push(found)
+                }
+
+                console.log(appsFound.toString());
+            }   
+            
+        })
+    })
+}
+
+function Init(){
+    getMonitorCount()
+    getProcessList()
+}
+
+function createMainWindow() {
+ 
+    Init()
     mainWindow = new BrowserWindow(
         {
+            
             title : ' DeepProctor Exam Browser',
             width : displayList[0].workArea.width/2,
             height : displayList[0].workArea.height/2,
             icon: `${__dirname}/assets/icons/Icon_256x256.png`,
+            minimizable : false,
+            resizable : false,
             webPreferences: {
                 nodeIntegration : true,
                 contextIsolation: false
             },
             kiosk:false,
+            frame:true
             
         }
 
@@ -55,10 +114,6 @@ function createMainWindow() {
 
     mainWindow.loadFile(`./app/index.html`)
     //mainWindow.loadURL(`http://localhost/deb/app/index.html`)
-
-    
-
-    //mainWindow.webContents.send('user:valid', displayList.length)
 
     mainWindow.on('focus', () => {
         // Do your required stuff, when the window is focused
@@ -89,12 +144,19 @@ function httpGet(theUrl, o) {
                     if(retMessage == ""){
                         console.log(`$ The message is :${retMessage}, the url is ${o.url}`);
                         mainWindow.loadURL(o.url)
-                        mainWindow.kiosk = true
+                        mainWindow.frame = false
+                        mainWindow.maximize()
+                        mainWindow.kiosk = false
+
                         mainWindow.on('blur', () => {
                             // Do your required stuff, when the window loose the focus
-                            showQuitMessage()
-                        });
-                
+                            // showQuitMessage()
+                        });                   
+                        const timer = setInterval(function A() {
+                            // dialog.showMessageBox(mainWindow, {message:"Test"}).then(() => app.quit())
+                            Validate()
+                            Init()
+                        }, 10000);
                     }else {
                         mainWindow.webContents.send('user:valid', retMessage)
                 }
@@ -108,17 +170,39 @@ function httpGet(theUrl, o) {
     return ret
 }
 
+function Validate(){
+
+    let message = '';
+
+    console.log('validating....');
+
+    if(displayList.length > 1){
+        message = 'Multiple monitors detected. Exam is being terminated.'
+        dialog.showMessageBox(mainWindow, {message:message, title: "Exam Violation"}).then(() => app.quit())
+    }
+
+    if(appsFound.length > 0){
+        console.log(appsFound[0]);
+        message = `Following apps were opened while exam was in-progress: ${appsFound.toString()}. Exam is being terminated.`
+        dialog.showMessageBox(mainWindow, {message:message, title: "Exam Violation"}).then(() => app.quit())
+    }
+
+    
+}
+
 function showQuitMessage(){
+
+    if(isCalcInFocus) return
 
     violationCount++
     const options = {
         buttons: ['Ok'],
         defaultId: 2,
         title: 'Exam Violation - Warning',
-        message: (violationCount > 0)?'System detected you were trying to navigate away from the exam. Your exam is being terminated' : 'Your exam is being terminated immediately'
+        message: (violationCount < 3)?'System detected you were trying to navigate away from the exam. Please go back and continue the exam. Any further activity will cause the exam to be terminated.' : 'Your exam is being terminated immediately'
     };
     
-    if(false){
+    if(violationCount < 3){
         const response = dialog.showMessageBox(mainWindow, options, null);
         response.then(() => {
             console.log('trying to refocus');
@@ -152,6 +236,7 @@ function createAboutWindow() {
 }
 
 function createCalcWindow() {
+    isCalcInFocus = true
     aboutWindow = new BrowserWindow({
     title: 'Simple Calculator',
     width: 400,
@@ -160,6 +245,12 @@ function createCalcWindow() {
     resizable: false,
     backgroundColor: 'white',
     })
+
+    aboutWindow.on('blur', () => {
+        // Do your required stuff, when the window loose the focus
+        isCalcInFocus = false
+        mainWindow.focus()
+    });
 
     aboutWindow.loadFile('./app/calc.html')
 }
@@ -171,11 +262,20 @@ ipcMain.on('url:open', (e,o) => {
     retMessage = "";
 
     //check if only 1 monitor is connected
-    if(displayList.length > 1){
+    if(getMonitorCount().length > 1){
         retMessage = "Multiple monitors detected. You can only have 1 monitor connected in order to start the exam."
         mainWindow.webContents.send('user:valid', retMessage)
         return
     }
+
+    if(appsFound.length > 0){
+    
+        retMessage = `Following apps need to be closed before you can proceed : ${appsFound.toString()}`
+        mainWindow.webContents.send('user:valid', retMessage)
+        getProcessList()
+        return
+    }
+
 
     let urlToOpen = o.url.toString();
     let apiUrl = `${API_URL}${encodeUrl(urlToOpen)}`
@@ -186,56 +286,56 @@ ipcMain.on('url:open', (e,o) => {
     
 
 
-const menu =[ 
-                {
-                    role:'fileMenu'
-                }
-            ]
+// const menu =[ 
+//                 {
+//                     role:'fileMenu'
+//                 }
+//             ]
 
-// const menu = [
-//         ...(isMac
-//         ? [
-//             {
-//                 label: app.name,
-//                 submenu: [
-//                 {
-//                     label: 'Calculator',
-//                     click: createCalcWindow,
-//                 },
-//                 ],
-//             },
-//             ]
-//         : []),
-//         {
-//         role: 'fileMenu',
-//         },
-//         ...(!isMac
-//         ? [
-//             {
-//                 label: 'Tools',
-//                 submenu: [
-//                 {
-//                     label: 'Calculator',
-//                     click: createCalcWindow,
-//                 },
-//                 ],
-//             },
-//             ]
-//         : []),
-//         ...(isDev
-//         ? [
-//             {
-//                 label: 'Developer',
-//                 submenu: [
-//                 { role: 'reload' },
-//                 { role: 'forcereload' },
-//                 { type: 'separator' },
-//                 { role: 'toggledevtools' },
-//                 ],
-//             },
-//             ]
-//         : []),
-//     ]
+const menu = [
+        ...(isMac
+        ? [
+            {
+                label: app.name,
+                submenu: [
+                {
+                    label: 'Calculator',
+                    click: createCalcWindow,
+                },
+                ],
+            },
+            ]
+        : []),
+        {
+        role: 'fileMenu',
+        },
+        ...(!isMac
+        ? [
+            {
+                label: 'Tools',
+                submenu: [
+                {
+                    label: 'Calculator',
+                    click: createCalcWindow,
+                },
+                ],
+            },
+            ]
+        : []),
+        ...(isDev
+        ? [
+            {
+                label: 'Developer',
+                submenu: [
+                { role: 'reload' },
+                { role: 'forcereload' },
+                { type: 'separator' },
+                { role: 'toggledevtools' },
+                ],
+            },
+            ]
+        : []),
+    ]
 
 // app.on('ready', () => {
 //     createMainWindow()
