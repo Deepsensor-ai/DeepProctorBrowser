@@ -69,16 +69,19 @@ function getProcessList(){
             illegalAppMap.set('firefox',' FireFox')
             illegalAppMap.set('iexplore',' Internet Explorer')
 
+        if(processes == undefined){
+            console.log("Process is undefined..");
+            return
+        } 
+
         processes.forEach( o => {
             let found = illegalAppMap.get(o.name.toLowerCase())
             if(found != undefined){
                 if(! appsFound.includes(found)){
                     appsFound.push(found)
                 }
-
                 console.log(appsFound.toString());
-            }   
-            
+            }             
         })
     })
 }
