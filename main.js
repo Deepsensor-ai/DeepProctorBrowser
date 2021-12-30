@@ -1,5 +1,6 @@
 const { app, BrowserWindow, globalShortcut, Menu, ipcMain,screen, shell, dialog, net } = require('electron')
 const Main = require('electron/main');
+const { autoUpdater } = require('electron-updater');
 
 var _ = require('lodash');
 var ps = require('current-processes');
@@ -110,6 +111,11 @@ function createMainWindow() {
 
     )
 
+    //auto-updater
+    mainWindow.once('ready-to-show', () => {
+        autoUpdater.checkForUpdatesAndNotify();
+    });
+
      //mainWindow.webContents.toggleDevTools();
 
     mainWindow.loadFile(`./app/index.html`)
@@ -121,6 +127,18 @@ function createMainWindow() {
     }); 
 
 }
+
+autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update_available');
+  });
+
+autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update_downloaded');
+    });
+
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});
 
 function httpGet(theUrl, o) {
 
@@ -356,6 +374,8 @@ app.on('ready', () => {
         console.log('Cmd+Y');
     })
 })
+
+
 
 app.on('window-all-closed', () => {
     if (!isMac) {
