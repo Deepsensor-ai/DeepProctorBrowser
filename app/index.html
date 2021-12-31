@@ -14,7 +14,7 @@
 	</head>
 	<body>
 		<div class="container center-align">
-			<h5><i class="fas fa-images"></i> DeepProctor Exam Browser</h5>
+			<h5><i class="fas fa-images"></i> DeepProctor Exam Browser v1.06</h5>
         
             <!-- <div class="card output">
 				<div class="card-content">
@@ -44,7 +44,7 @@
         </div>
 
 		<script src="../js/materialize.min.js"></script>
-        <script>
+        <!-- <script>
             const notification = document.getElementById('notification');
             const message = document.getElementById('message');
             const restartButton = document.getElementById('restart-button');
@@ -65,7 +65,7 @@
             function restartApp() {
                 ipcRenderer.send('restart_app');
             }
-        </script>
+        </script> -->
         <script>
 
             let bridgeConnected = true;
@@ -80,6 +80,9 @@
                 const form = document.getElementById("image-form")
                 const txtExamUrl = document.getElementById("txtExamUrl")
                 const btnExam = document.getElementById("btnExam")
+                const notification = document.getElementById('notification');
+                const message = document.getElementById('message');
+                const restartButton = document.getElementById('restart-button');
 
                 if(bridgeConnected){
                     ipcRenderer.on('user:valid', (e,d) => {
@@ -89,6 +92,18 @@
                         M.toast({
                                 html: d,
                             })
+                    })
+                    
+                    ipcRenderer.on('update_available', () => {
+                    ipcRenderer.removeAllListeners('update_available');
+                        message.innerText = 'A new update is available. Downloading now...';
+                        notification.classList.remove('hidden');
+                    })
+                    ipcRenderer.on('update_downloaded', () => {
+                        ipcRenderer.removeAllListeners('update_downloaded');
+                        message.innerText = 'Update Downloaded. It will be installed on restart.';
+                        //restartButton.classList.remove('hidden');
+                        notification.classList.remove('hidden');
                     })
                 }
             
@@ -122,6 +137,14 @@
             function isValidHttpUrl(_string) {
                 const matchpattern = /^https:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/gm;
                     return matchpattern.test(_string);
+            }
+
+            function closeNotification() {
+                    notification.classList.add('hidden');
+                }
+
+            function restartApp() {
+                ipcRenderer.send('restart_app');
             }
 
         </script>
