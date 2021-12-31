@@ -221,15 +221,16 @@ function showQuitMessage(){
         defaultId: 2,
         title: 'Exam Violation - Warning',
         message: (violationCount < 3)?'System detected you were trying to navigate away from the exam. Please go back and continue the exam. Any further activity will cause the exam to be terminated.' : 'Your exam is being terminated immediately'
+       
     };
     
     if(violationCount < 3){
         const response = dialog.showMessageBox(mainWindow, options, null);
         response.then(() => {
             console.log('trying to refocus');
-            mainWindow.restore()
-            mainWindow.focus();
-            mainWindow.setKiosk(true);
+           // mainWindow.restore()
+           // mainWindow.focus();
+            //mainWindow.setKiosk(true);
         })
         //mainWindow.restore();
         
@@ -254,6 +255,7 @@ function createAboutWindow() {
     })
 
     aboutWindow.loadFile('./app/about.html')
+  
 }
 
 function createCalcWindow() {
@@ -272,6 +274,11 @@ function createCalcWindow() {
         isCalcInFocus = false
         mainWindow.focus()
     });
+
+    aboutWindow.on('closed', () => {
+        isCalcInFocus = false
+        console.log('closing focus event');
+    })
 
     aboutWindow.loadFile('./app/calc.html')
 }
