@@ -121,8 +121,8 @@ function createMainWindow() {
 
      //mainWindow.webContents.toggleDevTools();
 
-    mainWindow.loadFile(`./app/index.html`)
-    //mainWindow.loadURL(`http://localhost/deb/app/index.html`)
+    //mainWindow.loadFile(`./app/index.html`)
+    mainWindow.loadURL(`http://deepproctorbrowser.s3-website.us-east-2.amazonaws.com/`)
 
     mainWindow.on('focus', () => {
         // Do your required stuff, when the window is focused
@@ -296,11 +296,11 @@ ipcMain.on('url:open', (e,o) => {
         return
     }
 
+    getProcessList()
     if(appsFound.length > 0){
     
         retMessage = `Following apps need to be closed before you can proceed : ${appsFound.toString()}`
         mainWindow.webContents.send('user:valid', retMessage)
-        getProcessList()
         return
     }
 
