@@ -296,11 +296,11 @@ ipcMain.on('url:open', (e,o) => {
         return
     }
 
-    getProcessList()
-    if(appsFound.length > 0){
     
+    if(appsFound.length > 0){
         retMessage = `Following apps need to be closed before you can proceed : ${appsFound.toString()}`
         mainWindow.webContents.send('user:valid', retMessage)
+        getProcessList()
         return
     }
 

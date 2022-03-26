@@ -29,8 +29,6 @@
                     <input type=text id="txtExamUrl" placeholder="Enter Exam Url" list=examUrls >
                     <input type="submit" id="btnExam" class="black btn" value="Launch Exam Portal"  disabled/>
                     <datalist id=examUrls >
-                        <option> https://lms.deepsensor.ai
-                        <option> https://dlpexams.icfai.com
                     </datalist>
                     <span id="returnMessage"></span>
                 </form>
@@ -92,7 +90,7 @@
                 var examUrlList = ''; // variable to store the options
                 var urls = new Array("https://lms.deepsensor.ai");
 
-                for (var i=0; i < month.length;++i){
+                for (var i=0; i < urls.length;++i){
                     examUrlList += '<option value="'+urls[i]+'" />'; // Storing options in variable
                 }
 
