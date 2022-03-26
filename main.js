@@ -337,19 +337,19 @@ const menu = [
         {
         role: 'fileMenu',
         },
-        ...(!isMac
-        ? [
-            {
-                label: 'Tools',
-                submenu: [
-                {
-                    label: 'Calculator',
-                    click: createCalcWindow,
-                },
-                ],
-            },
-            ]
-        : []),
+        // ...(!isMac
+        // ? [
+        //     {
+        //         label: 'Tools',
+        //         submenu: [
+        //         {
+        //             label: 'Calculator',
+        //             click: createCalcWindow,
+        //         },
+        //         ],
+        //     },
+        //     ]
+        // : []),
         ...(isDev
         ? [
             {
