@@ -122,8 +122,8 @@ function createMainWindow() {
      //mainWindow.webContents.toggleDevTools();
 
     //mainWindow.loadFile(`./app/index.html`)
-    mainWindow.loadURL(`http://deepproctorbrowser.s3-website.us-east-2.amazonaws.com/`)
-
+    //mainWindow.loadURL(`http://deepproctorbrowser.s3-website.us-east-2.amazonaws.com/`)
+    mainWindow.loadURL("http://localhost:3000/Main/?examId=12121&studentId=12121&orgCode=%27ICFAI%27")
     mainWindow.on('focus', () => {
         // Do your required stuff, when the window is focused
         console.log('focus');
